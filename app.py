@@ -117,28 +117,25 @@ st.markdown("""
 .stat-number { font-size: 2.4rem; font-weight: 800; color: #e07b54; }
 .stat-label  { font-size: 0.82rem; color: #888; margin-top: 2px; }
 
-/* ── Card buttons: invisible wrapper so .rv-card does the styling ── */
-[data-testid="stButton"] > button {
-    text-align: left !important; white-space: normal !important;
-    height: auto !important; padding: 0 !important;
-    border: none !important; background: transparent !important;
-    font-weight: normal !important; box-shadow: none !important; width: 100% !important;
-}
-[data-testid="stButton"] > button:hover,
-[data-testid="stButton"] > button:focus {
-    background: transparent !important; border: none !important; box-shadow: none !important; outline: none !important;
-}
-/* Restore sidebar nav buttons */
-[data-testid="stSidebar"] [data-testid="stButton"] > button {
-    border: 1px solid rgba(255,255,255,0.15) !important;
-    padding: 0.4rem 0.8rem !important;
-    border-radius: 6px !important;
-    background: rgba(255,255,255,0.05) !important;
+/* ── Card-style buttons (browse grid only) ── */
+[data-testid="stMainBlockContainer"] [data-testid="stButton"] > button {
+    text-align: left !important;
+    white-space: normal !important;
     height: auto !important;
+    min-height: 90px !important;
+    padding: 0.9rem 1rem !important;
+    border-radius: 14px !important;
+    border: 1.5px solid rgba(128,128,128,0.2) !important;
+    background: transparent !important;
+    font-weight: normal !important;
+    line-height: 1.55 !important;
+    transition: border-color 0.18s, box-shadow 0.18s, transform 0.12s !important;
 }
-[data-testid="stSidebar"] [data-testid="stButton"] > button:hover {
-    background: rgba(255,255,255,0.1) !important;
-    border-color: rgba(255,255,255,0.3) !important;
+[data-testid="stMainBlockContainer"] [data-testid="stButton"] > button:hover {
+    border-color: #e07b54 !important;
+    box-shadow: 0 4px 16px rgba(224,123,84,0.15) !important;
+    transform: translateY(-1px) !important;
+    color: inherit !important;
 }
 
 /* ── Mobile ── */
@@ -241,23 +238,17 @@ def _tag_pills(tags: list[str]) -> str:
 
 
 def _render_card(recipe, tags: list[str]) -> None:
-    """Render a recipe card. The .rv-card div does all the visual styling;
-    the Streamlit button is stripped to invisible so clicking the card works."""
+    """Render a clickable recipe card as a styled Streamlit button."""
     rid   = recipe["recipe_id"]
-    fav   = '<span class="rv-card-fav">❤️</span>' if recipe["is_favorite"] else ""
+    fav   = " ❤️" if recipe["is_favorite"] else ""
     emoji = _CAT_EMOJI.get(recipe["category"], "🍽️")
-    tag_html = _tag_pills(tags[:4])
-    card_html = (
-        f'<div class="rv-card">' + fav +
-        f'<span class="rv-card-emoji">{emoji}</span>' +
-        f'<div class="rv-card-title">{recipe["title"]}</div>' +
-        f'<div class="rv-card-cat">{recipe["category"]}</div>' +
-        f'<div class="rv-card-tags">{tag_html}</div>' +
-        f'</div>'
+    tag_text = "  ".join(f"`{t}`" for t in tags[:3])
+    label = (
+        f"{emoji} **{recipe['title']}**{fav}  \n"
+        f"*{recipe['category']}*  \n"
+        f"{tag_text}"
     )
-    st.markdown(card_html, unsafe_allow_html=True)
-    # Invisible full-width button overlays the card — CSS strips its appearance
-    if st.button("​", key=f"open_{rid}", use_container_width=True):  # zero-width space label
+    if st.button(label, key=f"open_{rid}", use_container_width=True):
         nav("detail", rid)
 
 
