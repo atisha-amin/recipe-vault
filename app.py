@@ -44,86 +44,111 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-/* Sidebar */
+/* ── Sidebar ── */
 [data-testid="stSidebar"] { background: #1a1a2e; }
 [data-testid="stSidebar"] * { color: #e8e8f0 !important; }
 
-/* Recipe cards */
-.recipe-card {
-    background: var(--background-color);
-    border: 1px solid rgba(128,128,128,0.2);
-    border-radius: 12px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 0.6rem;
+/* ── Browse hero ── */
+.rv-hero { padding: 2rem 0 1rem 0; }
+.rv-hero h1 { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.5px; margin: 0 0 0.3rem 0; }
+.rv-hero p  { color: #888; font-size: 1rem; margin: 0; }
+
+/* ── Recipe cards grid ── */
+.rv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+    margin-top: 1rem;
+}
+.rv-card {
+    border: 1.5px solid rgba(128,128,128,0.18);
+    border-radius: 14px;
+    padding: 1.1rem 1.2rem 1rem;
     cursor: pointer;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.18s, box-shadow 0.18s, transform 0.12s;
+    position: relative;
 }
-.recipe-card:hover {
+.rv-card:hover {
     border-color: #e07b54;
-    box-shadow: 0 2px 8px rgba(224,123,84,0.15);
+    box-shadow: 0 4px 16px rgba(224,123,84,0.13);
+    transform: translateY(-2px);
 }
+.rv-card-emoji  { font-size: 1.9rem; margin-bottom: 0.45rem; display: block; }
+.rv-card-title  { font-size: 1rem; font-weight: 700; margin: 0 0 3px 0; line-height: 1.3; }
+.rv-card-cat    { font-size: 0.77rem; color: #888; margin-bottom: 7px; }
+.rv-card-fav    { position: absolute; top: 10px; right: 12px; font-size: 0.85rem; }
+.rv-card-tags   { margin-top: 5px; }
 
-/* Recipe detail */
-.recipe-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
-.recipe-meta  { color: #888; font-size: 0.85rem; margin-bottom: 1rem; }
-
-/* Tag pills */
+/* ── Tag pills ── */
 .tag-pill {
     display: inline-block;
-    background: rgba(224,123,84,0.15);
+    background: rgba(224,123,84,0.12);
     color: #e07b54;
     border-radius: 20px;
-    padding: 2px 10px;
-    font-size: 0.78rem;
-    margin: 2px;
+    padding: 2px 9px;
+    font-size: 0.73rem;
+    margin: 2px 2px 0 0;
 }
 
-/* Section headers in recipe detail */
+/* ── Recipe detail ── */
+.recipe-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
+.recipe-meta  { color: #888; font-size: 0.85rem; margin-bottom: 1rem; }
 .section-header {
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 1.05rem; font-weight: 700;
     border-bottom: 2px solid #e07b54;
-    padding-bottom: 4px;
-    margin: 1.25rem 0 0.75rem 0;
-    color: #e07b54;
+    padding-bottom: 4px; margin: 1.25rem 0 0.75rem 0;
+    color: #e07b54; text-transform: uppercase; letter-spacing: 0.04em;
 }
-
-/* Ingredient sub-section label */
 .ingredient-sublabel {
-    font-size: 0.82rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #888;
-    margin: 0.75rem 0 0.25rem 0;
+    font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: #888; margin: 0.75rem 0 0.3rem 0;
 }
-
-/* Ingredient line */
-.ingredient-line { padding: 3px 0; border-bottom: 1px solid rgba(128,128,128,0.1); }
-
-/* Instruction step */
-.instruction-step { display: flex; gap: 12px; margin-bottom: 12px; }
+.ingredient-line { padding: 4px 0; border-bottom: 1px solid rgba(128,128,128,0.1); font-size: 0.95rem; }
+.instruction-step { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
 .step-num {
-    background: #e07b54;
-    color: white;
-    border-radius: 50%;
+    background: #e07b54; color: white; border-radius: 50%;
     width: 26px; height: 26px; min-width: 26px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 0.8rem; font-weight: 700; margin-top: 2px;
+    font-size: 0.78rem; font-weight: 700; margin-top: 2px;
 }
 
-/* Stat cards */
-.stat-card { background: rgba(224,123,84,0.08); border-radius: 10px; padding: 1rem; text-align: center; }
-.stat-number { font-size: 2.5rem; font-weight: 700; color: #e07b54; }
-.stat-label  { font-size: 0.85rem; color: #888; }
+/* ── Stat cards ── */
+.stat-card { background: rgba(224,123,84,0.07); border-radius: 12px; padding: 1.1rem; text-align: center; border: 1px solid rgba(224,123,84,0.15); }
+.stat-number { font-size: 2.4rem; font-weight: 800; color: #e07b54; }
+.stat-label  { font-size: 0.82rem; color: #888; margin-top: 2px; }
 
-/* Mobile: stack columns */
+/* ── Card buttons: invisible wrapper so .rv-card does the styling ── */
+[data-testid="stButton"] > button {
+    text-align: left !important; white-space: normal !important;
+    height: auto !important; padding: 0 !important;
+    border: none !important; background: transparent !important;
+    font-weight: normal !important; box-shadow: none !important; width: 100% !important;
+}
+[data-testid="stButton"] > button:hover,
+[data-testid="stButton"] > button:focus {
+    background: transparent !important; border: none !important; box-shadow: none !important; outline: none !important;
+}
+/* Restore sidebar nav buttons */
+[data-testid="stSidebar"] [data-testid="stButton"] > button {
+    border: 1px solid rgba(255,255,255,0.15) !important;
+    padding: 0.4rem 0.8rem !important;
+    border-radius: 6px !important;
+    background: rgba(255,255,255,0.05) !important;
+    height: auto !important;
+}
+[data-testid="stSidebar"] [data-testid="stButton"] > button:hover {
+    background: rgba(255,255,255,0.1) !important;
+    border-color: rgba(255,255,255,0.3) !important;
+}
+
+/* ── Mobile ── */
 @media (max-width: 640px) {
+    .rv-hero h1 { font-size: 1.8rem; }
+    .rv-grid    { grid-template-columns: 1fr; }
     .recipe-title { font-size: 1.4rem; }
     .stat-number  { font-size: 1.8rem; }
 }
-
-hr { border-color: rgba(128,128,128,0.2) !important; }
+hr { border-color: rgba(128,128,128,0.18) !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -204,62 +229,140 @@ with st.sidebar:
 
 # ── Shared helpers ────────────────────────────────────────────────────────────
 
+_CAT_EMOJI: dict[str, str] = {
+    "Cakes": "🎂", "Cookies": "🍪", "Brownies": "🍫", "Bread": "🍞",
+    "Muffins": "🧁", "Cheesecake": "🍰", "Savory": "🍝",
+    "Mousse & Cups": "🥛", "Candy & Truffles": "🍬", "Cobblers & Crisps": "🍑",
+}
+
+
 def _tag_pills(tags: list[str]) -> str:
     return " ".join(f'<span class="tag-pill">{t}</span>' for t in tags)
 
 
 def _render_card(recipe, tags: list[str]) -> None:
-    fav = " ❤️" if recipe["is_favorite"] else ""
+    """Render a recipe card. The .rv-card div does all the visual styling;
+    the Streamlit button is stripped to invisible so clicking the card works."""
+    rid   = recipe["recipe_id"]
+    fav   = '<span class="rv-card-fav">❤️</span>' if recipe["is_favorite"] else ""
+    emoji = _CAT_EMOJI.get(recipe["category"], "🍽️")
     tag_html = _tag_pills(tags[:4])
-    st.markdown(
-        f'<div class="recipe-card">'
-        f'<strong>{recipe["title"]}</strong>{fav}<br>'
-        f'<small style="color:#888">{recipe["category"]}</small>'
-        f'<div style="margin-top:6px">{tag_html}</div>'
-        f'</div>',
-        unsafe_allow_html=True,
+    card_html = (
+        f'<div class="rv-card">' + fav +
+        f'<span class="rv-card-emoji">{emoji}</span>' +
+        f'<div class="rv-card-title">{recipe["title"]}</div>' +
+        f'<div class="rv-card-cat">{recipe["category"]}</div>' +
+        f'<div class="rv-card-tags">{tag_html}</div>' +
+        f'</div>'
     )
-    if st.button("Open →", key=f"open_{recipe['recipe_id']}"):
-        nav("detail", recipe["recipe_id"])
+    st.markdown(card_html, unsafe_allow_html=True)
+    # Invisible full-width button overlays the card — CSS strips its appearance
+    if st.button("​", key=f"open_{rid}", use_container_width=True):  # zero-width space label
+        nav("detail", rid)
 
 
-def _two_col_cards(recipes: list) -> None:
-    col_a, col_b = st.columns(2)
+def _card_grid(recipes: list) -> None:
+    """Render all recipe cards in a responsive CSS grid (3 cols → 1 on mobile)."""
+    # Split into 3 columns; CSS grid handles reflow on mobile
+    cols = st.columns(3)
     for i, r in enumerate(recipes):
         tags = get_tags_for_recipe(r["recipe_id"])
-        with (col_a if i % 2 == 0 else col_b):
+        with cols[i % 3]:
             _render_card(r, tags)
 
 
 # ── Page: Browse ──────────────────────────────────────────────────────────────
 
 def render_browse() -> None:
-    st.title("📖 All Recipes")
-    recipes = get_all_recipes()
+    recipes    = get_all_recipes()
+    all_cats   = sorted({r["category"] for r in recipes if r["category"]})
+    total      = len(recipes)
+    fav_count  = sum(1 for r in recipes if r["is_favorite"])
 
-    cats = ["All"] + sorted({r["category"] for r in recipes if r["category"]})
-    col_f, col_s, col_fav = st.columns([2, 1, 1])
-    with col_f:
-        sel_cat = st.selectbox("Category", cats, label_visibility="collapsed")
-    with col_s:
-        sort_by = st.selectbox("Sort", ["Title", "Date Added"], label_visibility="collapsed")
+    # ── Hero header ───────────────────────────────────────────────────────
+    st.markdown(
+        f'''<div class="rv-hero">
+            <h1>🍰 Recipe Vault</h1>
+            <p>{total} recipes · {fav_count} favourites</p>
+        </div>''',
+        unsafe_allow_html=True,
+    )
+
+    # ── Search bar ────────────────────────────────────────────────────────
+    query = st.text_input(
+        "search", placeholder="🔍  Search recipes, ingredients, tags…",
+        label_visibility="collapsed",
+    )
+
+    # ── Filter row ────────────────────────────────────────────────────────
+    col_sort, col_fav = st.columns([3, 1])
+    with col_sort:
+        sort_by = st.selectbox(
+            "sort", ["A → Z", "Newest first"],
+            label_visibility="collapsed",
+        )
     with col_fav:
-        only_favs = st.checkbox("❤️ Favorites only")
+        only_favs = st.checkbox("❤️  Favourites only")
 
-    if sel_cat != "All":
-        recipes = [r for r in recipes if r["category"] == sel_cat]
+    # ── Category pill filter bar ──────────────────────────────────────────
+    if "browse_cat" not in st.session_state:
+        st.session_state.browse_cat = "All"
+
+    pill_html = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0 0.5rem 0;">' 
+    for cat in ["All"] + all_cats:
+        active = "background:#e07b54;color:#fff;border-color:#e07b54;" if st.session_state.browse_cat == cat else ""
+        pill_html += (
+            f'<span style="display:inline-block;padding:5px 15px;border-radius:999px;' +
+            f'border:1.5px solid rgba(128,128,128,0.25);font-size:0.82rem;font-weight:500;' +
+            f'cursor:default;{active}">{cat}</span>'
+        )
+    pill_html += '</div>'
+    st.markdown(pill_html, unsafe_allow_html=True)
+
+    # Category filter via selectbox (hidden label, synced with pills display)
+    sel_cat = st.selectbox(
+        "Category filter", ["All"] + all_cats,
+        index=(["All"] + all_cats).index(st.session_state.browse_cat)
+            if st.session_state.browse_cat in ["All"] + all_cats else 0,
+        label_visibility="collapsed",
+        key="browse_cat_select",
+    )
+    if sel_cat != st.session_state.browse_cat:
+        st.session_state.browse_cat = sel_cat
+        st.rerun()
+
+    # ── Apply filters ─────────────────────────────────────────────────────
+    if query.strip():
+        from app.recipes import search_recipes
+        filtered = search_recipes(
+            query=query,
+            category=sel_cat if sel_cat != "All" else "",
+        )
+    else:
+        filtered = [r for r in recipes if sel_cat == "All" or r["category"] == sel_cat]
+
     if only_favs:
-        recipes = [r for r in recipes if r["is_favorite"]]
+        filtered = [r for r in filtered if r["is_favorite"]]
 
-    sort_col = "title" if sort_by == "Title" else "date_added"
-    recipes = sorted(recipes, key=lambda r: r[sort_col] or "", reverse=(sort_col == "date_added"))
+    if sort_by == "A → Z":
+        filtered = sorted(filtered, key=lambda r: (r["title"] or "").lower())
+    else:
+        filtered = sorted(filtered, key=lambda r: r["date_added"] or "", reverse=True)
 
-    if not recipes:
-        st.info("No recipes found. Try clearing filters or adding some!")
+    # ── Results count ─────────────────────────────────────────────────────
+    count = len(filtered)
+    st.markdown(
+        f'<p style="color:#888;font-size:0.85rem;margin-bottom:0.25rem">' +
+        f'{count} recipe{"s" if count != 1 else ""}</p>',
+        unsafe_allow_html=True,
+    )
+
+    if not filtered:
+        st.info("No recipes found — try a different search or filter.")
         return
 
-    st.markdown(f"*{len(recipes)} recipe{'s' if len(recipes) != 1 else ''}*")
-    _two_col_cards(recipes)
+    # ── Card grid ─────────────────────────────────────────────────────────
+    _card_grid(filtered)
 
 
 # ── Page: Search ──────────────────────────────────────────────────────────────
@@ -288,7 +391,7 @@ def render_search() -> None:
         )
         st.markdown(f"*{len(results)} result{'s' if len(results) != 1 else ''} found*")
         if results:
-            _two_col_cards(results)
+            _card_grid(results)
         else:
             st.info("No recipes matched. Try different keywords.")
     else:
@@ -304,7 +407,7 @@ def render_favorites() -> None:
         st.info("No favorites yet. Open a recipe and click the heart!")
         return
     st.markdown(f"*{len(recipes)} favorite recipe{'s' if len(recipes) != 1 else ''}*")
-    _two_col_cards(list(recipes))
+    _card_grid(list(recipes))
 
 
 # ── Page: Recently Viewed ─────────────────────────────────────────────────────
