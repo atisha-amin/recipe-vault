@@ -432,66 +432,63 @@ def render_detail(recipe_id: int) -> None:
         return
 
     tags = get_tags_for_recipe(recipe_id)
-    fav_icon = "❤️" if recipe["is_favorite"] else "🤍"
 
-    # ── Header row ────────────────────────────────────────────────────────
-    col_title, col_actions = st.columns([4, 1])
-
-    with col_title:
+    # ── Title + meta ──────────────────────────────────────────────────────
+    st.markdown(
+        f'<div class="recipe-title">{recipe["title"]}</div>',
+        unsafe_allow_html=True,
+    )
+    meta_parts: list[str] = []
+    if recipe["category"]:
+        meta_parts.append(f"📂 {recipe['category']}")
+    if recipe["date_added"]:
+        meta_parts.append(f"📅 {recipe['date_added']}")
+    if recipe["source"]:
+        src = recipe["source"]
+        if src.startswith("http"):
+            meta_parts.append(f'🔗 <a href="{src}" target="_blank">{src}</a>')
+        else:
+            meta_parts.append(f"🔗 {src}")
+    if meta_parts:
         st.markdown(
-            f'<div class="recipe-title">{recipe["title"]}</div>',
+            f'<div class="recipe-meta">{" · ".join(meta_parts)}</div>',
             unsafe_allow_html=True,
         )
-        meta_parts: list[str] = []
-        if recipe["category"]:
-            meta_parts.append(f"📂 {recipe['category']}")
-        if recipe["date_added"]:
-            meta_parts.append(f"📅 {recipe['date_added']}")
-        if recipe["source"]:
-            src = recipe["source"]
-            if src.startswith("http"):
-                meta_parts.append(f'🔗 <a href="{src}" target="_blank">{src}</a>')
-            else:
-                meta_parts.append(f"🔗 {src}")
-        if meta_parts:
-            st.markdown(
-                f'<div class="recipe-meta">{" · ".join(meta_parts)}</div>',
-                unsafe_allow_html=True,
-            )
-        if tags:
-            st.markdown(_tag_pills(tags), unsafe_allow_html=True)
+    if tags:
+        st.markdown(_tag_pills(tags), unsafe_allow_html=True)
 
-    with col_actions:
-        if st.button(
-            f"{fav_icon} {'Unfavorite' if recipe['is_favorite'] else 'Favorite'}",
-            use_container_width=True,
-        ):
+    # ── Compact action bar ────────────────────────────────────────────────
+    fav_icon  = "❤️" if recipe["is_favorite"] else "🤍"
+    fav_label = "Unfavorite" if recipe["is_favorite"] else "Favorite"
+    md = recipe_to_markdown(recipe, tags)
+
+    a1, a2, a3, a4, spacer = st.columns([1, 1, 1.2, 1, 4])
+    with a1:
+        if st.button(f"{fav_icon} {fav_label}", key="btn_fav"):
             toggle_favorite(recipe_id)
             st.rerun()
-
-        if st.button("✏️ Edit", use_container_width=True):
+    with a2:
+        if st.button("✏️ Edit", key="btn_edit"):
             st.session_state.edit_mode = True
             st.rerun()
-
-        md = recipe_to_markdown(recipe, tags)
+    with a3:
         st.download_button(
-            "⬇️ Export .md",
+            "⬇️ Export",
             data=md,
             file_name=f"{recipe['title'].lower().replace(' ', '_')}.md",
             mime="text/markdown",
-            use_container_width=True,
+            key="btn_export",
         )
-
+    with a4:
         if not st.session_state.confirm_delete:
-            if st.button("🗑️ Delete", use_container_width=True):
+            if st.button("🗑️ Delete", key="btn_del"):
                 st.session_state.confirm_delete = True
                 st.rerun()
         else:
-            st.warning("Delete this recipe?")
-            if st.button("Yes, delete", use_container_width=True):
+            if st.button("⚠️ Confirm", key="btn_del_confirm"):
                 delete_recipe(recipe_id)
                 nav("browse")
-            if st.button("Cancel", use_container_width=True):
+            if st.button("Cancel", key="btn_del_cancel"):
                 st.session_state.confirm_delete = False
                 st.rerun()
 
